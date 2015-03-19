@@ -74,8 +74,8 @@ public class UndoBarController extends LinearLayout {
     private boolean mShowing;
 
 
-    private static Animation inAnimation;
-    private static Animation outAnimation;
+    private Animation inAnimation;
+    private Animation outAnimation;
     private final TextView mMessageView;
     private final TextView mButton;
     private final Handler mHideHandler = new Handler();
@@ -175,44 +175,9 @@ public class UndoBarController extends LinearLayout {
         }
     }
 
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    /**
-     * Deprecated, use {@link com.cocosw.undobar.UndoBarController.UndoBar} instead
-     *
-     * Quick method to insert a UndoBar into an Activity
-     *
-     * @param activity  Activity to hold this view
-     * @param message   The message will be shown in left side in undobar
-     * @param listener  Callback listener triggered after click undobar
-     * @param undoToken Token info,will pass to callback to help you to undo
-     * @param immediate Show undobar immediately or show it with animation
-     * @param style     {@link UndoBarStyle}
-     * @return UndoBarController
-     */
-    public static UndoBarController show(final Activity activity,
-                                         final CharSequence message, final UndoListener listener,
-                                         final Parcelable undoToken, final boolean immediate,
-                                         final UndoBarStyle style) {
-        return show(activity, message, listener, undoToken, immediate, style, -1);
-
-    }
-
-    @Deprecated
-    public static UndoBarController show(final Activity activity,
-                                         final CharSequence message, UndoListener listener,
-                                         Parcelable undoToken, boolean immediate, UndoBarStyle style,
-                                         int translucent) {
-        if (style == null)
-            throw new IllegalArgumentException("style must not be empty.");
-        return new UndoBar(activity).message(message).listener(listener).token(undoToken).style(style).translucent((translucent == 1)).show(!immediate);
-
-    }
-
     private static UndoBarController getBar(final Activity activity, UndoBar undobar) {
         UndoBarController undo = ensureView(activity);
-        undo.listener = undobar.listener;
+        //undo.listener = undobar.listener;
         return undo;
     }
 
@@ -233,44 +198,6 @@ public class UndoBarController extends LinearLayout {
             undo = (UndoBarController) view.getParent();
         }
         return undo;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    public static UndoBarController show(final Activity activity,
-                                         final int message, final UndoListener listener,
-                                         final Parcelable undoToken, final boolean immediate) {
-        return new UndoBar(activity).message(message).listener(listener).token(undoToken).show(false);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    public static UndoBarController show(final Activity activity,
-                                         final CharSequence message, final UndoListener listener,
-                                         final Parcelable undoToken) {
-        return new UndoBar(activity).message(message).listener(listener).token(undoToken).show();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    public static UndoBarController show(final Activity activity,
-                                         final CharSequence message, final UndoListener listener,
-                                         final UndoBarStyle style) {
-        return new UndoBar(activity).message(message).listener(listener).style(style).show();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    public static UndoBarController show(final Activity activity,
-                                         final CharSequence message, final UndoListener listener) {
-        return new UndoBar(activity).message(message).listener(listener).show();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    public static UndoBarController show(final Activity activity,
-                                         final CharSequence message) {
-        return new UndoBar(activity).message(message).show();
     }
 
     @Deprecated
@@ -306,20 +233,20 @@ public class UndoBarController extends LinearLayout {
         return context.getResources().getConfiguration().smallestScreenWidthDp >= 600;
     }
 
-    /**
-     * Deprecated, Change the default In/Out animation
-     * Please define your undobar style in your theme, do not use this anymore
-     *
-     * @param inAnimation
-     * @param outAnimation
-     */
-    @Deprecated
-    public static void setAnimation(Animation inAnimation, Animation outAnimation) {
-        if (inAnimation != null)
-            UndoBarController.inAnimation = inAnimation;
-        if (outAnimation != null)
-            UndoBarController.outAnimation = outAnimation;
-    }
+//    /**
+//     * Deprecated, Change the default In/Out animation
+//     * Please define your undobar style in your theme, do not use this anymore
+//     *
+//     * @param inAnimation
+//     * @param outAnimation
+//     */
+//    @Deprecated
+//    public static void setAnimation(Animation inAnimation, Animation outAnimation) {
+//        if (inAnimation != null)
+//            UndoBarController.inAnimation = inAnimation;
+//        if (outAnimation != null)
+//            UndoBarController.outAnimation = outAnimation;
+//    }
 
     @SuppressLint("NewApi")
     private float getSmallestWidthDp(WindowManager wm) {
