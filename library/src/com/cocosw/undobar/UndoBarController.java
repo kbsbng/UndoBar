@@ -82,6 +82,7 @@ public class UndoBarController extends LinearLayout {
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
+            final UndoListener listener = getUndoListener();
             if (listener instanceof AdvancedUndoListener) {
                 ((AdvancedUndoListener) listener).onHide(currentMessage.undoToken);
             }
@@ -97,7 +98,6 @@ public class UndoBarController extends LinearLayout {
     private String sNavBarOverride;
     private boolean mNavBarAvailable;
     private float mSmallestWidthDp;
-    private UndoListener listener;
 
     private void addMessage(Message message) {
         mMessages.add(message);
@@ -126,6 +126,7 @@ public class UndoBarController extends LinearLayout {
                         // #44
                         if (!mShowing)
                             return;
+                        final UndoListener listener = getUndoListener();
                         if (listener != null) {
                             listener.onUndo(currentMessage.undoToken);
                         }
@@ -214,16 +215,17 @@ public class UndoBarController extends LinearLayout {
             v.setVisibility(View.GONE);
             v.mShowing = false;
             v.mHideHandler.removeCallbacks(v.mHideRunnable);
-            if (v.listener instanceof AdvancedUndoListener) {
+            final UndoListener listener = v.getUndoListener();
+            if (listener instanceof AdvancedUndoListener) {
                 if (v.currentMessage == null)
-                    ((AdvancedUndoListener) v.listener).onClear(new Parcelable[]{});
+                    ((AdvancedUndoListener) listener).onClear(new Parcelable[]{});
                 else {
                     Parcelable[] parcels = new Parcelable[v.mMessages.size() + 1];
                     parcels[0] = v.currentMessage.undoToken;
                     for (int i = 0; i < v.mMessages.size(); i++) {
                         parcels[i + 1] = v.mMessages.get(i).undoToken;
                     }
-                    ((AdvancedUndoListener) v.listener).onClear(parcels);
+                    ((AdvancedUndoListener) listener).onClear(parcels);
                 }
             }
         }
@@ -326,9 +328,11 @@ public class UndoBarController extends LinearLayout {
      * @return
      */
     public UndoListener getUndoListener() {
-        return listener;
+        if (currentMessage == null) {
+            return null;
+        }
+        return currentMessage.listener;
     }
-
 
     private void hideUndoBar(final boolean immediate) {
         mHideHandler.removeCallbacks(mHideRunnable);
@@ -629,7 +633,7 @@ public class UndoBarController extends LinearLayout {
             }
             immediate = !anim;
             UndoBarController bar = UndoBarController.getBar(activity, this);
-            Message msg = new Message(style, message, duration, undoToken, translucent, colorDrawable, noIcon, immediate);
+            Message msg = new Message(style, message, duration, undoToken, translucent, colorDrawable, noIcon, immediate, listener);
             if (bar.mShowing)
                 bar.addMessage(msg);
             else
@@ -714,9 +718,12 @@ public class UndoBarController extends LinearLayout {
         private boolean colorDrawable = true;
         private boolean noIcon = false;
         public boolean immediate;
+        private UndoListener listener;
 
 
-        private Message(UndoBarStyle style, CharSequence message, long duration, Parcelable undoToken, int translucent, boolean colorDrawable, boolean noIcon, boolean immediate) {
+        private Message(UndoBarStyle style, CharSequence message, long duration, Parcelable undoToken,
+                        int translucent, boolean colorDrawable, boolean noIcon, boolean immediate,
+                        UndoListener listener) {
             this.style = style;
             this.message = message;
             this.duration = duration;
@@ -725,6 +732,7 @@ public class UndoBarController extends LinearLayout {
             this.colorDrawable = colorDrawable;
             this.noIcon = noIcon;
             this.immediate = immediate;
+            this.listener = listener;
         }
 
         @Override
