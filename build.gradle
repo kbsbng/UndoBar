@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 LiaoKai
+ * Copyright (C) 2014 LiaoKai
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
+        classpath 'com.android.tools.build:gradle:1.2.3'
     }
 }
 
@@ -31,7 +31,6 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
 
     tasks.withType(JavaCompile) {
