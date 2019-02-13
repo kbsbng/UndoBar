@@ -117,24 +117,21 @@ public class UndoBarController extends LinearLayout {
         LayoutInflater.from(context).inflate(R.layout.undobar, this, true);
         ta.recycle();
 
-        mMessageView = (TextView) findViewById(R.id.undobar_message);
-        mButton = (TextView) findViewById(id.undobar_button);
+        mMessageView = findViewById(id.undobar_message);
+        mButton = findViewById(id.undobar_button);
         mButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View view) {
-                        // #44
-                        if (!mShowing)
-                            return;
-                        final UndoListener listener = getUndoListener();
-                        if (listener != null) {
-                            listener.onUndo(currentMessage.undoToken);
-                        }
-                        if (currentMessage.immediate) {
-                            hideUndoBar(true);
-                        } else {
-                            hideUndoBar(false);
-                        }
+                view -> {
+                    // #44
+                    if (!mShowing)
+                        return;
+                    final UndoListener listener = getUndoListener();
+                    if (listener != null) {
+                        listener.onUndo(currentMessage.undoToken);
+                    }
+                    if (currentMessage.immediate) {
+                        hideUndoBar(true);
+                    } else {
+                        hideUndoBar(false);
                     }
                 }
         );
@@ -147,8 +144,8 @@ public class UndoBarController extends LinearLayout {
             mInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
             try {
-                Class c = Class.forName("android.os.SystemProperties");
-                Method m = c.getDeclaredMethod("get", String.class);
+                @SuppressLint("PrivateApi") Class c = Class.forName("android.os.SystemProperties");
+                @SuppressWarnings("unchecked") Method m = c.getDeclaredMethod("get", String.class);
                 m.setAccessible(true);
                 sNavBarOverride = (String) m.invoke(null, "qemu.hw.mainkeys");
             } catch (Throwable e) {
@@ -376,6 +373,7 @@ public class UndoBarController extends LinearLayout {
 
     @Override
     protected Parcelable onSaveInstanceState() {
+        super.onSaveInstanceState();
         final Bundle outState = new Bundle();
         final int count = mMessages.size();
         final Message[] messages = new Message[count];

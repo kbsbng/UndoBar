@@ -1,7 +1,7 @@
 //apply from: 'https://raw.githubusercontent.com/soarcn/gradle/master/legacy-android-library.gradle'
 apply plugin: 'com.android.library'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+//apply plugin: 'eclipse'
+//apply plugin: 'idea'
 
 
 android {
