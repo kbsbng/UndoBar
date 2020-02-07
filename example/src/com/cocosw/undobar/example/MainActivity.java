@@ -2,13 +2,12 @@ package com.cocosw.undobar.example;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.cocosw.undobar.example.R.id;
-import com.cocosw.undobar.example.R.layout;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 

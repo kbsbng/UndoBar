@@ -2,8 +2,8 @@ package com.cocosw.undobar;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
 import android.view.animation.Animation;
 
 public class UndoBarStyle implements Parcelable {
