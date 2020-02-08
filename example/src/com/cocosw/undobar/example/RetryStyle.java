@@ -2,8 +2,8 @@ package com.cocosw.undobar.example;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
+import androidx.core.app.LoaderManager.LoaderCallbacks;
+import androidx.core.content.Loader;
 import android.view.MenuItem;
 import android.view.View;
 
