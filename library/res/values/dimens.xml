@@ -5,4 +5,8 @@
     <dimen name="undobarMarginBottom">16dp</dimen>
     <dimen name="undobarBackgroundColor">16dp</dimen>
     <dimen name="undoBarCornerRadius">0dp</dimen>
+
+    <dimen name="marginLeft">16dp</dimen>
+    <dimen name="marginRight">16dp</dimen>
+    <dimen name="marginBottom">16dp</dimen>
 </resources>
