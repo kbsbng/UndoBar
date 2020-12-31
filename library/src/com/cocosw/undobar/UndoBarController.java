@@ -250,12 +250,7 @@ public class UndoBarController extends LinearLayout {
     @SuppressLint("NewApi")
     private float getSmallestWidthDp(WindowManager wm) {
         DisplayMetrics metrics = new DisplayMetrics();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            wm.getDefaultDisplay().getRealMetrics(metrics);
-        } else {
-            //this is not correct, but we don't really care pre-kitkat
-            wm.getDefaultDisplay().getMetrics(metrics);
-        }
+        wm.getDefaultDisplay().getRealMetrics(metrics);
         float widthDp = metrics.widthPixels / metrics.density;
         float heightDp = metrics.heightPixels / metrics.density;
         return Math.min(widthDp, heightDp);
@@ -265,18 +260,16 @@ public class UndoBarController extends LinearLayout {
     private int getNavigationBarHeight(Context context) {
         Resources res = context.getResources();
         int result = 0;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            if (hasNavBar(context)) {
-                String key;
-                if (mInPortrait) {
-                    key = NAV_BAR_HEIGHT_RES_NAME;
-                } else {
-                    if (!isNavigationAtBottom())
-                        return 0;
-                    key = NAV_BAR_HEIGHT_LANDSCAPE_RES_NAME;
-                }
-                return getInternalDimensionSize(res, key);
+        if (hasNavBar(context)) {
+            String key;
+            if (mInPortrait) {
+                key = NAV_BAR_HEIGHT_RES_NAME;
+            } else {
+                if (!isNavigationAtBottom())
+                    return 0;
+                key = NAV_BAR_HEIGHT_LANDSCAPE_RES_NAME;
             }
+            return getInternalDimensionSize(res, key);
         }
         return result;
     }
@@ -488,6 +481,7 @@ public class UndoBarController extends LinearLayout {
     /**
      * UndoBar Builder
      */
+    @SuppressWarnings("unused")
     public static class UndoBar implements Parcelable {
 
 
@@ -649,10 +643,12 @@ public class UndoBarController extends LinearLayout {
             return show(true);
         }
 
+        @SuppressWarnings("unused")
         public void onSaveInstanceState(@NonNull Bundle saveState) {
             saveState.putParcelable("undobar", UndoBarController.getBar(activity, this).onSaveInstanceState());
         }
 
+        @SuppressWarnings("unused")
         public void onRestoreInstanceState(@NonNull Bundle loadState) {
             UndoBarController undobar = UndoBarController.getBar(activity, this);
             undobar.onRestoreInstanceState(loadState.getParcelable("undobar"));
@@ -708,13 +704,13 @@ public class UndoBarController extends LinearLayout {
 
 
     private static class Message implements Parcelable {
-        private UndoBarStyle style;
-        private CharSequence message;
-        private long duration;
-        private Parcelable undoToken;
-        private int translucent = -1;
-        private boolean colorDrawable = true;
-        private boolean noIcon = false;
+        private final UndoBarStyle style;
+        private final CharSequence message;
+        private final long duration;
+        private final Parcelable undoToken;
+        private final int translucent;
+        private final boolean colorDrawable;
+        private final boolean noIcon;
         public boolean immediate;
         private UndoListener listener;
 
