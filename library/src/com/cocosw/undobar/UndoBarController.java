@@ -31,6 +31,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -175,16 +177,16 @@ public class UndoBarController extends LinearLayout {
     }
 
     private static UndoBarController getBar(final Activity activity, UndoBar undobar) {
-        UndoBarController undo = ensureView(activity);
+        UndoBarController undo = ensureView(activity, undobar);
         //undo.listener = undobar.listener;
         return undo;
     }
 
-    private static UndoBarController ensureView(Activity activity) {
+    private static UndoBarController ensureView(Activity activity, UndoBar undobar) {
         UndoBarController undo = UndoBarController.getView(activity);
         if (undo == null) {
             undo = new UndoBarController(activity, null);
-            ((ViewGroup) activity.findViewById(android.R.id.content))
+            ((ViewGroup) activity.findViewById(undobar.container))
                     .addView(undo);
         }
         return undo;
@@ -497,6 +499,9 @@ public class UndoBarController extends LinearLayout {
         private boolean noIcon = false;
         public boolean immediate;
 
+        @IdRes
+        private int container = android.R.id.content;
+
 
         public UndoBar(@NonNull Activity activity) {
             this.activity = activity;
@@ -619,6 +624,11 @@ public class UndoBarController extends LinearLayout {
                 bar.showUndoBar(msg);
             init();
             return bar;
+        }
+
+        public UndoBar setContainer(@IdRes final int container) {
+            this.container = container;
+            return this;
         }
 
         /**
