@@ -5,6 +5,7 @@ apply plugin: 'com.android.library'
 
 
 android {
+    namespace 'com.cocosw.undobar'
     compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VERSION)
     buildToolsVersion project.BUILD_TOOLS_VERSION
     compileOptions.encoding = "UTF-8"
@@ -46,8 +47,8 @@ android {
     }
 
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_11
     }
 
     packagingOptions {
@@ -61,5 +62,5 @@ android {
 //apply from: 'https://raw.githubusercontent.com/soarcn/gradle/master/maven_push.gradle'
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.9.1'
 }
