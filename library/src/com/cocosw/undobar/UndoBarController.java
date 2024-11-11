@@ -31,6 +31,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -54,6 +56,7 @@ import com.cocosw.undobar.R.string;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 
+@SuppressWarnings("unused")
 public class UndoBarController extends LinearLayout {
 
     private static final String SAVED_STATE = "_state_undobar";
@@ -174,16 +177,16 @@ public class UndoBarController extends LinearLayout {
     }
 
     private static UndoBarController getBar(final Activity activity, UndoBar undobar) {
-        UndoBarController undo = ensureView(activity);
+        UndoBarController undo = ensureView(activity, undobar);
         //undo.listener = undobar.listener;
         return undo;
     }
 
-    private static UndoBarController ensureView(Activity activity) {
+    private static UndoBarController ensureView(Activity activity, UndoBar undobar) {
         UndoBarController undo = UndoBarController.getView(activity);
         if (undo == null) {
             undo = new UndoBarController(activity, null);
-            ((ViewGroup) activity.findViewById(android.R.id.content))
+            ((ViewGroup) activity.findViewById(undobar.container))
                     .addView(undo);
         }
         return undo;
@@ -250,12 +253,7 @@ public class UndoBarController extends LinearLayout {
     @SuppressLint("NewApi")
     private float getSmallestWidthDp(WindowManager wm) {
         DisplayMetrics metrics = new DisplayMetrics();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            wm.getDefaultDisplay().getRealMetrics(metrics);
-        } else {
-            //this is not correct, but we don't really care pre-kitkat
-            wm.getDefaultDisplay().getMetrics(metrics);
-        }
+        wm.getDefaultDisplay().getRealMetrics(metrics);
         float widthDp = metrics.widthPixels / metrics.density;
         float heightDp = metrics.heightPixels / metrics.density;
         return Math.min(widthDp, heightDp);
@@ -265,18 +263,16 @@ public class UndoBarController extends LinearLayout {
     private int getNavigationBarHeight(Context context) {
         Resources res = context.getResources();
         int result = 0;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            if (hasNavBar(context)) {
-                String key;
-                if (mInPortrait) {
-                    key = NAV_BAR_HEIGHT_RES_NAME;
-                } else {
-                    if (!isNavigationAtBottom())
-                        return 0;
-                    key = NAV_BAR_HEIGHT_LANDSCAPE_RES_NAME;
-                }
-                return getInternalDimensionSize(res, key);
+        if (hasNavBar(context)) {
+            String key;
+            if (mInPortrait) {
+                key = NAV_BAR_HEIGHT_RES_NAME;
+            } else {
+                if (!isNavigationAtBottom())
+                    return 0;
+                key = NAV_BAR_HEIGHT_LANDSCAPE_RES_NAME;
             }
+            return getInternalDimensionSize(res, key);
         }
         return result;
     }
@@ -321,8 +317,6 @@ public class UndoBarController extends LinearLayout {
 
     /**
      * Get callback listener
-     *
-     * @return
      */
     public UndoListener getUndoListener() {
         if (currentMessage == null) {
@@ -410,25 +404,30 @@ public class UndoBarController extends LinearLayout {
             if (currentMessage.noIcon) {
                 mButton.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
             } else if (currentMessage.style.iconRes > 0) {
-                Drawable drawable = getResources().getDrawable(currentMessage.style.iconRes);
                 int iColor = mButton.getTextColors().getDefaultColor();
+                mButton.setCompoundDrawablesWithIntrinsicBounds(null, null, null,null);
+                try {
+                    Drawable drawable = getResources().getDrawable(currentMessage.style.iconRes);
+                    if (currentMessage.colorDrawable) {
+                        int red = (iColor & 0xFF0000) / 0xFFFF;
+                        int green = (iColor & 0xFF00) / 0xFF;
+                        int blue = iColor & 0xFF;
 
-                if (currentMessage.colorDrawable) {
-                    int red = (iColor & 0xFF0000) / 0xFFFF;
-                    int green = (iColor & 0xFF00) / 0xFF;
-                    int blue = iColor & 0xFF;
+                        float[] matrix = {0, 0, 0, 0, red
+                                , 0, 0, 0, 0, green
+                                , 0, 0, 0, 0, blue
+                                , 0, 0, 0, 1, 0};
 
-                    float[] matrix = {0, 0, 0, 0, red
-                            , 0, 0, 0, 0, green
-                            , 0, 0, 0, 0, blue
-                            , 0, 0, 0, 1, 0};
+                        ColorFilter colorFilter = new ColorMatrixColorFilter(matrix);
 
-                    ColorFilter colorFilter = new ColorMatrixColorFilter(matrix);
+                        drawable.setColorFilter(colorFilter);
+                        mButton.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+                    }
+                } catch (Exception ignored) {
 
-                    drawable.setColorFilter(colorFilter);
                 }
 
-                mButton.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+
             }
         } else {
             mButton.setVisibility(View.GONE);
@@ -461,8 +460,6 @@ public class UndoBarController extends LinearLayout {
 
         /**
          * The callback function will be called when user press button in Undobar
-         *
-         * @param token
          */
         void onUndo(@Nullable Parcelable token);
     }
@@ -473,8 +470,6 @@ public class UndoBarController extends LinearLayout {
     public interface AdvancedUndoListener extends UndoListener {
         /**
          * The callback function will be called when the Undobar fade out after duration without button clicked.
-         *
-         * @param token
          */
         void onHide(@Nullable Parcelable token);
 
@@ -504,6 +499,9 @@ public class UndoBarController extends LinearLayout {
         private boolean noIcon = false;
         public boolean immediate;
 
+        @IdRes
+        private int container = android.R.id.content;
+
 
         public UndoBar(@NonNull Activity activity) {
             this.activity = activity;
@@ -530,7 +528,6 @@ public class UndoBarController extends LinearLayout {
          * Set the message to be displayed on the left of the undobar.
          *
          * @param message message
-         * @return
          */
         public UndoBar message(@NonNull CharSequence message) {
             this.message = message;
@@ -544,9 +541,6 @@ public class UndoBarController extends LinearLayout {
 
         /**
          * Set the message to be displayed on the left of the undobar.
-         *
-         * @param messageRes
-         * @return
          */
         public UndoBar message(@StringRes int messageRes) {
             this.message = activity.getText(messageRes);
@@ -557,8 +551,8 @@ public class UndoBarController extends LinearLayout {
          * Sets the duration the undo bar will be shown.<br>
          * Default is defined in style
          *
-         * @param duraton
-         * @return
+         * @param duraton duration
+         * @return this
          */
         public UndoBar duration(long duraton) {
             this.duration = duraton;
@@ -568,8 +562,8 @@ public class UndoBarController extends LinearLayout {
         /**
          * Sets the listener which will be trigger when button been clicked.
          *
-         * @param mUndoListener
-         * @return
+         * @param mUndoListener mUndoListener
+         * @return this
          */
         public UndoBar listener(@NonNull UndoListener mUndoListener) {
             this.listener = mUndoListener;
@@ -579,9 +573,6 @@ public class UndoBarController extends LinearLayout {
 
         /**
          * Sets a token for undobar which will be returned in listener
-         *
-         * @param undoToken
-         * @return
          */
         public UndoBar token(@NonNull Parcelable undoToken) {
             this.undoToken = undoToken;
@@ -593,8 +584,7 @@ public class UndoBarController extends LinearLayout {
          * This is only for Kitkat+
          * Undobar will determin if translucent mode is used or not if you do not set this.
          *
-         * @param enable
-         * @return
+         * @param enable enable
          */
         public UndoBar translucent(boolean enable) {
             translucent = enable ? 1 : 0;
@@ -603,9 +593,6 @@ public class UndoBarController extends LinearLayout {
 
         /**
          * Whether the drawable in button should be rendered to the same color that the button text have.
-         *
-         * @param enable
-         * @return
          */
         public UndoBar colorDrawable(boolean enable) {
             colorDrawable = enable;
@@ -616,7 +603,6 @@ public class UndoBarController extends LinearLayout {
          * Show undobar with animation or not
          *
          * @param anim show animation or not
-         * @return
          */
         public UndoBarController show(boolean anim) {
             if (listener == null && style == null) {
@@ -640,10 +626,13 @@ public class UndoBarController extends LinearLayout {
             return bar;
         }
 
+        public UndoBar setContainer(@IdRes final int container) {
+            this.container = container;
+            return this;
+        }
+
         /**
          * Show undobar with animation
-         *
-         * @return
          */
         public UndoBarController show() {
             return show(true);
@@ -708,13 +697,13 @@ public class UndoBarController extends LinearLayout {
 
 
     private static class Message implements Parcelable {
-        private UndoBarStyle style;
-        private CharSequence message;
-        private long duration;
-        private Parcelable undoToken;
-        private int translucent = -1;
-        private boolean colorDrawable = true;
-        private boolean noIcon = false;
+        private final UndoBarStyle style;
+        private final CharSequence message;
+        private final long duration;
+        private final Parcelable undoToken;
+        private final int translucent;
+        private final boolean colorDrawable;
+        private final boolean noIcon;
         public boolean immediate;
         private UndoListener listener;
 

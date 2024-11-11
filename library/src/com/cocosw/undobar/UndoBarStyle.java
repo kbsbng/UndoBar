@@ -3,6 +3,7 @@ package com.cocosw.undobar;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import android.view.animation.Animation;
 
@@ -49,13 +50,14 @@ public class UndoBarStyle implements Parcelable {
      * @param duration duration the undobar will stay in screen
      * @param bg       background image for undobar
      */
+    @SuppressWarnings("unused")
     public UndoBarStyle(@DrawableRes final int icon, @StringRes final int title, @DrawableRes final int bg,
                         final long duration) {
         this(icon, title, duration);
         bgRes = bg;
     }
 
-    @Deprecated
+
     /**
      * Set Animation for current style
      *
@@ -63,6 +65,7 @@ public class UndoBarStyle implements Parcelable {
      * @param outAnimation animation for fade out
      * @return UndoBar
      */
+    @Deprecated
     public UndoBarStyle setAnim(Animation inAnimation, Animation outAnimation) {
         this.inAnimation = inAnimation;
         this.outAnimation = outAnimation;
@@ -71,6 +74,7 @@ public class UndoBarStyle implements Parcelable {
 
 
     @Override
+    @NonNull
     public String toString() {
         return "UndoBarStyle{" +
                 "iconRes=" + iconRes +
