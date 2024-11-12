@@ -15,3 +15,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep public class com.cocosw.undobar.UndoBarController$UndoListener
+-keep public class com.cocosw.undobar.UndoBarController$UndoBar
+-keep public class com.cocosw.undobar.*
+-keepclassmembers class com.cocosw.undobar.* {
+   public *;
+}
