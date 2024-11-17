@@ -6,8 +6,7 @@ apply plugin: 'com.android.library'
 
 android {
     namespace 'com.cocosw.undobar'
-    compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VERSION)
-    buildToolsVersion project.BUILD_TOOLS_VERSION
+    compileSdk Integer.parseInt(project.COMPILE_SDK_VERSION)
     compileOptions.encoding = "UTF-8"
     defaultConfig {
         versionCode Integer.parseInt(project.VERSION_CODE)
